@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Observable, filter, interval, map, tap } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -7,5 +8,24 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AppComponent implements OnInit {
 
-  ngOnInit() {}
+  interval$!: Observable<string>
+
+  ngOnInit() {
+    this.interval$ = interval(1000).pipe(
+      // Voici deux opérateur bas niveau ( filter et map)
+      // filtre les émissions d'un observable
+      filter(value => value % 3 === 0),
+      // on passe à map une foncion appellée à chaque émission de l'observable 
+      // transforme les emissions d'un observable -> map
+      map(value => value % 2 === 0 ?
+        `Je suis ${value} et je suis pair` : `Je suis ${value} et je suis impair`
+      ),
+      // side effects
+      tap(text => this.logger(text))
+    );
+  }
+
+  logger(text: string) {
+    console.log(`Log: ${text}`);
+  }
 }
